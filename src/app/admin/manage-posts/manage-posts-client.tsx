@@ -334,7 +334,7 @@ export default function ManagePostsClient({ posts: initialPosts }: ManagePostsCl
               </tr>
             </thead>
             <tbody className="divide-y divide-border/50">
-              {sortedPosts.map((post, index) => (
+              {sortedPosts.slice(0, 5).map((post, index) => (
                 <tr key={post.id} className="hover:bg-gradient-to-r hover:from-muted/20 hover:to-transparent transition-all duration-300 animate-slide-in group" style={{ animationDelay: `${index * 0.05}s` }}>
                   <td className="px-3 py-6 text-center">
                     <input
@@ -362,10 +362,7 @@ export default function ManagePostsClient({ posts: initialPosts }: ManagePostsCl
                             {Math.ceil(post.content.split(' ').length / 200)} min
                           </span>
                         </div>
-                        <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
-                          {post.content.substring(0, 120)}
-                          {post.content.length > 120 && '...'}
-                        </p>
+                        {/* Content preview removed */}
                         <div className="flex items-center gap-4 mt-3 text-xs text-muted-foreground">
                           <span className="flex items-center">
                             <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -559,30 +556,7 @@ export default function ManagePostsClient({ posts: initialPosts }: ManagePostsCl
           </div>
         </div>
 
-        <div className="bg-card rounded-xl border border-border p-6 hover-lift">
-          <div className="flex items-center justify-between mb-4">
-            <h4 className="font-semibold text-foreground">Storage</h4>
-            <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4" />
-            </svg>
-          </div>
-          <div className="space-y-3">
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Posts</span>
-              <span className="font-medium">{posts.length}</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Total words</span>
-              <span className="font-medium">
-                {posts.reduce((acc, post) => acc + post.content.split(' ').length, 0).toLocaleString()}
-              </span>
-            </div>
-            <div className="w-full bg-muted rounded-full h-2">
-              <div className="bg-primary h-2 rounded-full w-3/4"></div>
-            </div>
-            <p className="text-xs text-muted-foreground">75% of storage used</p>
-          </div>
-        </div>
+        {/* Storage section removed */}
       </div>
     </div>
   )

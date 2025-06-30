@@ -46,8 +46,13 @@ async function getPost(id: string): Promise<Post | null> {
   return post
 }
 
-export default async function PostPage({ params }: { params: { id: string } }) {
-  const id = params.id
+interface PageProps {
+  params: Promise<{ id: string }>
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}
+
+export default async function PostPage({ params, searchParams }: PageProps) {
+  const { id } = await params
   const post = await getPost(id)
   
   if (!post) {
