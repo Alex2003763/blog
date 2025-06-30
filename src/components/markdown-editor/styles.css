@@ -1,0 +1,460 @@
+/* Markdown Editor Styles */
+.markdown-editor {
+  --editor-border-radius: 0.5rem;
+
+  /* Default to CSS custom properties from the blog theme */
+  --editor-background: hsl(var(--background));
+  --editor-foreground: hsl(var(--foreground));
+  --editor-card: hsl(var(--card));
+  --editor-card-foreground: hsl(var(--card-foreground));
+  --editor-popover: hsl(var(--popover));
+  --editor-popover-foreground: hsl(var(--popover-foreground));
+  --editor-primary: hsl(var(--primary));
+  --editor-primary-foreground: hsl(var(--primary-foreground));
+  --editor-secondary: hsl(var(--secondary));
+  --editor-secondary-foreground: hsl(var(--secondary-foreground));
+  --editor-muted: hsl(var(--muted));
+  --editor-muted-foreground: hsl(var(--muted-foreground));
+  --editor-accent: hsl(var(--accent));
+  --editor-accent-foreground: hsl(var(--accent-foreground));
+  --editor-destructive: hsl(var(--destructive));
+  --editor-destructive-foreground: hsl(var(--destructive-foreground));
+  --editor-border: hsl(var(--border));
+  --editor-input: hsl(var(--input));
+  --editor-ring: hsl(var(--ring));
+}
+
+/* Base editor container */
+.markdown-editor {
+  display: flex;
+  flex-direction: column;
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  background: var(--editor-background);
+  color: var(--editor-foreground);
+  border-color: var(--editor-border);
+  height: 100%; /* Ensure it takes full height of parent */
+  min-height: 400px; /* Default min height */
+  max-height: 100vh; /* Default max height, adjust as needed */
+}
+
+/* Fullscreen mode */
+.markdown-editor.fullscreen {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  max-width: 100vw;
+  max-height: 100vh;
+  z-index: 10000;
+  background: var(--editor-background);
+  box-sizing: border-box;
+  overflow: hidden; /* Prevent scrolling on the container */
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Toolbar in fullscreen mode */
+.markdown-editor.fullscreen .toolbar {
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+/* Ensure content is properly sized in fullscreen */
+.markdown-editor.fullscreen .editor-content {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden; /* Let child elements handle their own scrolling */
+  display: flex;
+}
+
+.markdown-editor.fullscreen .editor-pane,
+.markdown-editor.fullscreen .preview-pane {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: auto; /* Allow horizontal scrolling in fullscreen mode */
+}
+
+/* Editor content area */
+.markdown-editor .editor-content {
+  display: flex;
+  flex: 1;
+  overflow: auto; /* Allow horizontal scrolling */
+}
+
+/* Editor pane with proper overflow handling */
+.markdown-editor .editor-pane {
+  overflow-y: auto;
+  overflow-x: auto; /* Allow horizontal scrolling in editor */
+}
+
+/* Responsive layout for mobile */
+@media (max-width: 768px) {
+  .markdown-editor.editor-live .editor-content {
+    flex-direction: column;
+  }
+
+  .markdown-editor.editor-live .editor-pane,
+  .markdown-editor.editor-live .preview-pane {
+    width: 100% !important;
+    height: 50%;
+  }
+
+  .markdown-editor.editor-live .editor-divider {
+    width: 100%;
+    height: 1px;
+  }
+
+  /* Hide drag bar on mobile in live mode */
+  .markdown-editor.editor-live .drag-bar {
+    display: none;
+  }
+
+  /* Mobile fullscreen adjustments */
+  .markdown-editor.fullscreen {
+    /* Account for mobile browser UI */
+    height: 100vh;
+    height: 100dvh; /* Use dynamic viewport height if supported */
+  }
+
+  .markdown-editor.fullscreen .editor-content {
+    flex-direction: column;
+  }
+
+  .markdown-editor.fullscreen .editor-pane,
+  .markdown-editor.fullscreen .preview-pane {
+    width: 100% !important;
+    height: 50% !important;
+    flex: 1;
+  }
+  
+  /* Adjust toolbar for mobile */
+  .markdown-editor .toolbar {
+    padding: 8px 12px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  
+  .markdown-editor .toolbar::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .markdown-editor .toolbar .toolbar-commands {
+    min-width: max-content;
+  }
+  
+  /* Larger touch targets for mobile */
+  .markdown-editor .toolbar button {
+    min-width: 44px;
+    min-height: 44px;
+    width: auto;
+    height: auto;
+    padding: 8px;
+  }
+  
+  /* Adjust textarea padding for mobile */
+  .markdown-editor textarea {
+    padding: 12px !important;
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
+  
+  /* Adjust preview padding for mobile */
+  .markdown-editor .markdown-preview {
+    padding: 12px !important;
+  }
+}
+
+/* Extra small screens */
+@media (max-width: 480px) {
+  .markdown-editor {
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+  }
+  
+  .markdown-editor .toolbar {
+    padding: 6px 8px;
+  }
+  
+  .markdown-editor .toolbar button {
+    min-width: 40px;
+    min-height: 40px;
+    padding: 6px;
+  }
+  
+  .markdown-editor textarea,
+  .markdown-editor .markdown-preview {
+    padding: 8px !important;
+  }
+}
+
+/* Syntax highlighting styles */
+.markdown-editor .syntax-highlight {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+.markdown-editor .syntax-highlight .token.title {
+  color: hsl(var(--primary));
+  font-weight: 600;
+}
+
+.markdown-editor .syntax-highlight .token.bold {
+  font-weight: 700;
+  color: var(--editor-foreground);
+}
+
+.markdown-editor .syntax-highlight .token.italic {
+  font-style: italic;
+  color: hsl(var(--muted-foreground));
+}
+
+.markdown-editor .syntax-highlight .token.code {
+  background: hsl(var(--muted));
+  color: hsl(var(--destructive));
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.25rem;
+  font-size: 0.875em;
+}
+
+.markdown-editor .syntax-highlight .token.url {
+  color: hsl(var(--primary));
+  text-decoration: underline;
+}
+
+.markdown-editor .syntax-highlight .token.list {
+  color: hsl(var(--primary));
+}
+
+.markdown-editor .syntax-highlight .token.blockquote {
+  color: hsl(var(--muted-foreground));
+  font-style: italic;
+  border-left: 4px solid hsl(var(--border));
+  padding-left: 0.5rem;
+}
+
+.markdown-editor .syntax-highlight .token.hr {
+  color: hsl(var(--muted-foreground));
+}
+
+/* Preview styles */
+.markdown-editor .markdown-preview {
+  overflow-y: auto;
+  overflow-x: hidden;
+  word-wrap: break-word;
+}
+
+.markdown-editor .markdown-preview h1,
+.markdown-editor .markdown-preview h2,
+.markdown-editor .markdown-preview h3,
+.markdown-editor .markdown-preview h4,
+.markdown-editor .markdown-preview h5,
+.markdown-editor .markdown-preview h6 {
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.markdown-editor .markdown-preview h1 {
+  font-size: 2em;
+  border-bottom: 1px solid hsl(var(--border));
+  padding-bottom: 0.3em;
+}
+
+.markdown-editor .markdown-preview h2 {
+  font-size: 1.5em;
+  border-bottom: 1px solid hsl(var(--border));
+  padding-bottom: 0.3em;
+}
+
+.markdown-editor .markdown-preview h3 {
+  font-size: 1.25em;
+}
+
+.markdown-editor .markdown-preview h4 {
+  font-size: 1em;
+}
+
+.markdown-editor .markdown-preview h5 {
+  font-size: 0.875em;
+}
+
+.markdown-editor .markdown-preview h6 {
+  font-size: 0.85em;
+  color: hsl(var(--muted-foreground));
+}
+
+.markdown-editor .markdown-preview p {
+  margin-bottom: 1em;
+}
+
+.markdown-editor .markdown-preview blockquote {
+  margin: 0;
+  padding: 0 1em;
+  color: hsl(var(--muted-foreground));
+  border-left: 0.25em solid hsl(var(--border));
+}
+
+.markdown-editor .markdown-preview ul,
+.markdown-editor .markdown-preview ol {
+  padding-left: 2em;
+  margin-bottom: 1em;
+}
+
+.markdown-editor .markdown-preview li {
+  margin-bottom: 0.25em;
+}
+
+.markdown-editor .markdown-preview code {
+  background: hsl(var(--muted));
+  color: hsl(var(--destructive));
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.25rem;
+  font-size: 0.875em;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+.markdown-editor .markdown-preview pre {
+  background: hsl(var(--muted));
+  color: var(--editor-foreground);
+  padding: 1em;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+  margin-bottom: 1em;
+}
+
+.markdown-editor .markdown-preview pre code {
+  background: transparent;
+  color: inherit;
+  padding: 0;
+  border-radius: 0;
+  font-size: inherit;
+}
+
+.markdown-editor .markdown-preview table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-bottom: 1em;
+}
+
+.markdown-editor .markdown-preview th,
+.markdown-editor .markdown-preview td {
+  border: 1px solid hsl(var(--border));
+  padding: 0.5em;
+  text-align: left;
+}
+
+.markdown-editor .markdown-preview th {
+  background: hsl(var(--muted));
+  font-weight: 600;
+}
+
+.markdown-editor .markdown-preview a {
+  color: hsl(var(--primary));
+  text-decoration: underline;
+}
+
+.markdown-editor .markdown-preview a:hover {
+  text-decoration: none;
+}
+
+.markdown-editor .markdown-preview img {
+  max-width: 100%;
+  height: auto;
+}
+
+.markdown-editor .markdown-preview hr {
+  border: none;
+  border-top: 1px solid hsl(var(--border));
+  margin: 2em 0;
+}
+
+/* Toolbar dropdown styles */
+.markdown-editor .toolbar-dropdown {
+  background: var(--editor-popover);
+  border: 1px solid var(--editor-border-color);
+  border-radius: var(--editor-border-radius);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  z-index: 50;
+}
+
+.markdown-editor .toolbar-dropdown button {
+  width: 100%;
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  color: var(--editor-popover-foreground);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.markdown-editor .toolbar-dropdown button:hover {
+  background: var(--editor-accent);
+  color: var(--editor-accent-foreground);
+}
+
+/* Focus styles */
+.markdown-editor textarea:focus {
+  outline: 2px solid var(--editor-ring);
+  outline-offset: 2px;
+}
+
+.markdown-editor button:focus {
+  outline: 2px solid var(--editor-ring);
+  outline-offset: 2px;
+}
+
+/* Scrollbar styles */
+.markdown-editor ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.markdown-editor ::-webkit-scrollbar-track {
+  background: var(--editor-muted);
+}
+
+.markdown-editor ::-webkit-scrollbar-thumb {
+  background: var(--editor-muted-foreground);
+  border-radius: 4px;
+}
+
+.markdown-editor ::-webkit-scrollbar-thumb:hover {
+  background: var(--editor-foreground);
+}
+
+/* Print styles */
+@media print {
+  .markdown-editor .toolbar,
+  .markdown-editor .drag-bar {
+    display: none !important;
+  }
+  
+  .markdown-editor {
+    border: none !important;
+    box-shadow: none !important;
+  }
+  
+  .markdown-editor .editor-content {
+    flex-direction: column;
+  }
+  
+  .markdown-editor .editor-pane {
+    display: none !important;
+  }
+  
+  .markdown-editor .preview-pane {
+    width: 100% !important;
+    height: auto !important;
+  }
+}

@@ -1,0 +1,875 @@
+@import "tailwindcss";
+
+/* Markdown Editor Styles */
+@import "@uiw/react-md-editor/markdown-editor.css";
+@import "@uiw/react-markdown-preview/markdown.css";
+
+/* Fix for MDEditor display issues */
+.w-md-editor {
+  background-color: hsl(var(--background)) !important;
+  border: 1px solid hsl(var(--border)) !important;
+  /* Removed min-height to allow flexible height */
+  color: hsl(var(--foreground)) !important;
+  /* Override MDEditor CSS variables */
+  --color-canvas-default: hsl(var(--background));
+  --color-fg-default: hsl(var(--foreground));
+  --color-border-default: hsl(var(--border));
+  --color-fg-muted: hsl(var(--muted-foreground));
+}
+
+.w-md-editor-text-textarea,
+.w-md-editor-text {
+  background-color: hsl(var(--background)) !important;
+  color: hsl(var(--foreground)) !important;
+  /* Removed min-height to allow flexible height */
+}
+
+.w-md-editor-text-input {
+  background-color: transparent !important;
+  color: hsl(var(--foreground)) !important;
+  caret-color: hsl(var(--foreground)) !important;
+  /* Fix for invisible text input */
+  -webkit-text-fill-color: hsl(var(--foreground)) !important;
+}
+
+.w-md-editor-text-pre {
+  background-color: transparent !important;
+  color: transparent !important;
+}
+
+.w-md-editor-preview {
+  background-color: hsl(var(--background)) !important;
+  color: hsl(var(--foreground)) !important;
+  min-height: 300px !important;
+}
+
+.w-md-editor-toolbar {
+  background-color: hsl(var(--card)) !important;
+  border-bottom: 1px solid hsl(var(--border)) !important;
+}
+
+.w-md-editor-toolbar button {
+  color: hsl(var(--foreground)) !important;
+  background-color: transparent !important;
+}
+
+.w-md-editor-toolbar button:hover {
+  background-color: hsl(var(--muted)) !important;
+}
+
+/* Ensure the editor is visible */
+.w-md-editor * {
+  box-sizing: border-box;
+}
+
+.w-md-editor-text-container {
+  display: flex !important;
+  flex: 1 !important;
+}
+
+.w-md-editor-text-pre,
+.w-md-editor-text-input {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+/* Fix for content area */
+.w-md-editor-content {
+  background-color: hsl(var(--background)) !important;
+}
+
+/* Fix for markdown preview content */
+.w-md-editor .wmde-markdown {
+  background-color: hsl(var(--background)) !important;
+  color: hsl(var(--foreground)) !important;
+}
+
+/* Force visibility for all editor elements */
+.w-md-editor-text-area,
+.w-md-editor-input,
+.w-md-editor-focus {
+  background-color: hsl(var(--background)) !important;
+  color: hsl(var(--foreground)) !important;
+}
+
+/* Additional wrapper styles */
+.md-editor-wrapper {
+  position: relative;
+  z-index: 1;
+}
+
+.md-editor-wrapper .w-md-editor {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* Fix fullscreen mode issues */
+.w-md-editor-fullscreen {
+  background-color: hsl(var(--background)) !important;
+  color: hsl(var(--foreground)) !important;
+  overflow: hidden !important; /* Prevent container overflow */
+  width: 100vw !important;
+  height: 90vh !important;
+  max-width: 100vw !important;
+  max-height: 90vh !important;
+  z-index: 999999 !important; /* Increased z-index to ensure it's above everything */
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  border-radius: 0 !important;
+  backdrop-filter: none !important; /* Prevent backdrop effects */
+  isolation: isolate !important; /* Create new stacking context */
+  box-sizing: border-box !important;
+}
+
+.w-md-editor-fullscreen .w-md-editor-content {
+  flex: 1 !important;
+  min-height: 0 !important;
+  overflow: hidden !important; /* Let child elements handle scrolling */
+  background-color: hsl(var(--background)) !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.w-md-editor-fullscreen .w-md-editor-text,
+.w-md-editor-fullscreen .w-md-editor-preview {
+  background-color: hsl(var(--background)) !important;
+  color: hsl(var(--foreground)) !important;
+  overflow: auto !important;
+}
+
+.w-md-editor-fullscreen .w-md-editor-text-textarea,
+.w-md-editor-fullscreen .w-md-editor-text-input {
+  background-color: hsl(var(--background)) !important;
+  color: hsl(var(--foreground)) !important;
+  -webkit-text-fill-color: hsl(var(--foreground)) !important;
+}
+
+/* Ensure fullscreen toolbar is visible and properly styled */
+.w-md-editor-fullscreen .w-md-editor-toolbar {
+  background-color: hsl(var(--card)) !important;
+  border-bottom: 1px solid hsl(var(--border)) !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 1000000 !important; /* Ensure toolbar is above everything in fullscreen */
+}
+
+/* Prevent body scroll when fullscreen is active */
+body:has(.w-md-editor-fullscreen) {
+  overflow: hidden !important;
+  position: fixed !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Hide all other elements when fullscreen is active - more specific approach */
+body:has(.w-md-editor-fullscreen) > *:not(script):not(style):not(.w-md-editor-fullscreen) {
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* Ensure fullscreen editor is always visible and interactive */
+body:has(.w-md-editor-fullscreen) .w-md-editor-fullscreen {
+  visibility: visible !important;
+  pointer-events: auto !important;
+}
+
+/* Prevent any overlays or modals from appearing over fullscreen */
+.w-md-editor-fullscreen {
+  contain: layout style paint !important;
+}
+
+/* Ensure no other fixed/absolute elements interfere */
+.w-md-editor-fullscreen::before {
+  content: '' !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  background-color: hsl(var(--background)) !important;
+  z-index: -1 !important;
+}
+
+/* Fix fullscreen content area layout */
+.w-md-editor-fullscreen .w-md-editor-content {
+  display: flex !important;
+  flex-direction: row !important;
+  overflow: hidden !important;
+  flex: 1 !important;
+}
+
+.w-md-editor-fullscreen .w-md-editor-text,
+.w-md-editor-fullscreen .w-md-editor-preview {
+  flex: 1 !important;
+  overflow: auto !important;
+}
+
+/* Ensure proper scrolling in fullscreen mode */
+.w-md-editor-fullscreen .w-md-editor-text-container,
+.w-md-editor-fullscreen .w-md-editor-preview {
+  flex: 1 !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  overflow-x: auto !important; /* Allow horizontal scrolling */
+  box-sizing: border-box !important;
+}
+
+/* Ensure text areas and preview areas fill available space in fullscreen */
+.w-md-editor-fullscreen .w-md-editor-text-textarea,
+.w-md-editor-fullscreen .w-md-editor-text,
+.w-md-editor-fullscreen .w-md-editor-preview {
+  min-height: 0 !important;
+  box-sizing: border-box !important;
+}
+
+/* Additional fullscreen layout fixes */
+.w-md-editor-fullscreen {
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.w-md-editor-fullscreen .w-md-editor-toolbar {
+  flex-shrink: 0 !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.w-md-editor-fullscreen .w-md-editor-content {
+  flex: 1 !important;
+  min-height: 0 !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+}
+
+/* Enhanced MDEditor width and responsiveness */
+.md-editor-wrapper {
+  width: 100% !important;
+  max-width: none !important;
+}
+
+.w-md-editor {
+  width: 100% !important;
+  max-width: none !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1) !important;
+}
+
+.w-md-editor .w-md-editor-toolbar {
+  background-color: hsl(var(--muted)) !important;
+  border-bottom: 1px solid hsl(var(--border)) !important;
+  padding: 8px 12px !important;
+}
+
+.w-md-editor .w-md-editor-text-container,
+.w-md-editor .w-md-editor-preview {
+  background-color: hsl(var(--background)) !important;
+  color: hsl(var(--foreground)) !important;
+}
+
+.w-md-editor .w-md-editor-text-container .w-md-editor-text {
+  background-color: transparent !important;
+  color: hsl(var(--foreground)) !important;
+  font-size: 15px !important;
+  line-height: 1.7 !important;
+  padding: 16px !important;
+}
+
+.w-md-editor .w-md-editor-preview {
+  padding: 16px !important;
+}
+
+/* Responsive editor adjustments */
+@media (max-width: 768px) {
+  .w-md-editor .w-md-editor-text-container .w-md-editor-text {
+    font-size: 14px !important;
+    padding: 12px !important;
+  }
+
+  .w-md-editor .w-md-editor-preview {
+    padding: 12px !important;
+  }
+
+  .w-md-editor .w-md-editor-toolbar {
+    padding: 6px 8px !important;
+  }
+
+  /* Mobile fullscreen improvements */
+  .w-md-editor-fullscreen .w-md-editor-toolbar {
+    padding: 8px !important;
+  }
+
+  .w-md-editor-fullscreen .w-md-editor-text-container .w-md-editor-text,
+  .w-md-editor-fullscreen .w-md-editor-preview {
+    padding: 12px !important;
+    font-size: 14px !important;
+  }
+}
+
+/* Tablet adjustments */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .w-md-editor .w-md-editor-text-container .w-md-editor-text {
+    font-size: 14px !important;
+    padding: 14px !important;
+  }
+
+  .w-md-editor .w-md-editor-preview {
+    padding: 14px !important;
+  }
+}
+
+/* Desktop enhancements */
+@media (min-width: 1025px) {
+  .w-md-editor .w-md-editor-text-container .w-md-editor-text {
+    font-size: 15px !important;
+    padding: 20px !important;
+  }
+
+  .w-md-editor .w-md-editor-preview {
+    padding: 20px !important;
+  }
+}
+
+/* Ensure text is visible in all states */
+.w-md-editor-text-input:focus,
+.w-md-editor-text-input:active,
+.w-md-editor-text-input {
+  color: hsl(var(--foreground)) !important;
+  background-color: transparent !important;
+  outline: none !important;
+  border: none !important;
+}
+
+/* Fix for potential z-index issues */
+.w-md-editor-text-container > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Ensure toolbar icons are visible */
+.w-md-editor-toolbar svg {
+  fill: hsl(var(--foreground)) !important;
+  color: hsl(var(--foreground)) !important;
+}
+
+/* Force text input visibility */
+.w-md-editor-text-input {
+  background-color: hsl(var(--background)) !important;
+  color: hsl(var(--foreground)) !important;
+  -webkit-text-fill-color: hsl(var(--foreground)) !important;
+  text-shadow: none !important;
+}
+
+/* Utility Classes */
+.line-clamp-1 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.line-clamp-3 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+/* Animation utilities */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.6s ease-out forwards;
+  opacity: 0;
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(var(--primary), 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(var(--primary), 0);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s infinite;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Touch improvements */
+@media (hover: none) and (pointer: coarse) {
+  .touch-manipulation {
+    touch-action: manipulation;
+  }
+
+  /* Increase touch targets on mobile */
+  button, a, input, select, textarea {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* Focus improvements for accessibility */
+*:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+}
+
+/* Reduced motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Loading shimmer effect */
+@keyframes shimmer {
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
+}
+
+.shimmer {
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  background-size: 200px 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  --card: #ffffff;
+  --card-foreground: #171717;
+  --popover: #ffffff;
+  --popover-foreground: #171717;
+  --primary: #171717;
+  --primary-foreground: #fafafa;
+  --secondary: #f5f5f5;
+  --secondary-foreground: #171717;
+  --muted: #f5f5f5;
+  --muted-foreground: #737373;
+  --accent: #f5f5f5;
+  --accent-foreground: #171717;
+  --destructive: #ef4444;
+  --destructive-foreground: #fafafa;
+  --border: #e5e5e5;
+  --input: #e5e5e5;
+  --ring: #171717;
+  --radius: 0.5rem;
+}
+
+.dark {
+  --background: #0a0a0a;
+  --foreground: #ededed;
+  --card: #0a0a0a;
+  --card-foreground: #ededed;
+  --popover: #0a0a0a;
+  --popover-foreground: #ededed;
+  --primary: #ededed;
+  --primary-foreground: #171717;
+  --secondary: #262626;
+  --secondary-foreground: #ededed;
+  --muted: #262626;
+  --muted-foreground: #a3a3a3;
+  --accent: #262626;
+  --accent-foreground: #ededed;
+  --destructive: #dc2626;
+  --destructive-foreground: #ededed;
+  --border: #262626;
+  --input: #262626;
+  --ring: #d4d4d8;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --radius: var(--radius);
+}
+
+* {
+  border-color: var(--border);
+}
+
+html, body {
+  height: 100%; /* Ensure html and body take full height */
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Cherry Markdown 編輯器樣式 */
+.cherry-editor-wrapper {
+  @apply w-full;
+}
+
+.cherry-editor .cherry {
+  @apply border-0 bg-background text-foreground;
+}
+
+.cherry-editor .cherry-toolbar {
+  @apply bg-card border-b border-border;
+}
+
+.cherry-editor .cherry-toolbar .toolbar-item {
+  @apply text-foreground hover:bg-muted;
+}
+
+.cherry-editor .cherry-editor {
+  @apply bg-background text-foreground;
+}
+
+.cherry-editor .cherry-previewer {
+  @apply bg-background text-foreground;
+}
+
+.cherry-editor .cherry-previewer .cherry-markdown {
+  @apply text-foreground;
+}
+
+/* Cherry Markdown 深色模式 */
+.dark .cherry-editor .cherry {
+  @apply bg-background text-foreground;
+}
+
+.dark .cherry-editor .cherry-toolbar {
+  @apply bg-card border-border;
+}
+
+.dark .cherry-editor .cherry-toolbar .toolbar-item {
+  @apply text-foreground;
+}
+
+.dark .cherry-editor .cherry-editor {
+  @apply bg-background text-foreground;
+}
+
+.dark .cherry-editor .cherry-previewer {
+  @apply bg-background text-foreground;
+}
+
+/* Markdown 渲染器樣式 */
+.markdown-renderer .prose {
+  @apply text-foreground;
+}
+
+.markdown-renderer .prose h1,
+.markdown-renderer .prose h2,
+.markdown-renderer .prose h3,
+.markdown-renderer .prose h4,
+.markdown-renderer .prose h5,
+.markdown-renderer .prose h6 {
+  @apply text-foreground;
+}
+
+.markdown-renderer .prose a {
+  @apply text-primary hover:text-primary/80;
+}
+
+.markdown-renderer .prose code {
+  @apply bg-muted text-foreground px-1 py-0.5 rounded;
+}
+
+.markdown-renderer .prose pre {
+  @apply bg-muted border border-border;
+}
+
+.markdown-renderer .prose blockquote {
+  @apply border-l-primary text-muted-foreground;
+}
+
+.markdown-renderer .prose table {
+  @apply border-border;
+}
+
+.markdown-renderer .prose th,
+.markdown-renderer .prose td {
+  @apply border-border;
+}
+
+.markdown-renderer .prose th {
+  @apply bg-muted;
+}
+
+/* 動畫效果 - Updated to use consistent animation names and properties */
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-slide-in {
+  animation: slide-in 0.5s ease-out forwards;
+  opacity: 0;
+}
+
+/* 懸停效果 */
+.hover-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.dark .hover-lift:hover {
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+/* 按鈕動畫 */
+.btn-primary {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.btn-primary:hover::before {
+  left: 100%;
+}
+
+/* 載入動畫 */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* 脈衝動畫 */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* 響應式設計 */
+@media (max-width: 768px) {
+  .container {
+    padding: 0 1rem;
+  }
+
+  .text-responsive {
+    font-size: 0.875rem;
+  }
+
+  .grid-responsive {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .hide-mobile {
+    display: none;
+  }
+
+  .text-responsive {
+    font-size: 0.75rem;
+  }
+}
+
+/* Utility classes */
+.line-clamp-1 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.line-clamp-3 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+/* Enhanced animations */
+@keyframes bounce-in {
+  0% {
+    transform: scale(0.3);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-up {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(var(--primary), 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(var(--primary), 0.8);
+  }
+}
+
+.animate-bounce-in {
+  animation: bounce-in 0.6s ease-out forwards;
+  opacity: 0;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.4s ease-out forwards;
+  opacity: 0;
+}
+
+.animate-glow {
+  animation: glow 2s ease-in-out infinite;
+}
+
+/* Improved hover effects */
+.hover-lift {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.hover-scale {
+  transition: transform 0.2s ease-in-out;
+}
+
+.hover-scale:hover {
+  transform: scale(1.05);
+}
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--secondary)));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Custom scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: hsl(var(--muted));
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: hsl(var(--primary));
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--primary) / 0.8);
+}
