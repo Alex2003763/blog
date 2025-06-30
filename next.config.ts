@@ -13,30 +13,37 @@ const nextConfig: NextConfig = {
       topLevelAwait: true,
     };
 
-    // 優化構建大小
     if (!isServer) {
       config.optimization = {
         ...config.optimization,
         minimize: true,
         splitChunks: {
           chunks: 'all',
+          maxInitialRequests: 25,
           minSize: 20000,
-          maxSize: 24000000, // 保持在 24MB 以下
+          maxSize: 24000000,
           cacheGroups: {
-            vendor: {
-              test: /[\\/]node_modules[\\/]/,
-              name(module: any) {
-                const packageName = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)[1];
-                return `vendor.${packageName.replace('@', '')}`;
-              },
-              priority: 10,
+            default: false,
+            vendors: false,
+            framework: {
+              chunks: 'all',
+              name: 'framework',
+              test: /(?<!node_modules.*)[\\/]node_modules[\\/](react|react-dom|scheduler|next)[\\/]/,
+              priority: 40,
+              enforce: true
             },
-          },
-        },
+            lib: {
+              test: /[\\/]node_modules[\\/]/,
+              chunks: 'all',
+              name: 'lib',
+              priority: 30
+            }
+          }
+        }
       };
     }
     return config;
-  },
+  }
 };
 
 export default nextConfig;
