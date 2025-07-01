@@ -1,12 +1,13 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation' // Keep useRouter for search bar
 import { Post } from '@/types/database'
 import { PostCard } from '@/components/post-card'
 import { SearchBar, SearchResults } from '@/components/search-bar'
 import { Pagination, PaginationInfo } from '@/components/pagination'
-import { searchPosts, paginateItems, formatDate } from '@/lib/utils'
+import { searchPosts, formatDate } from '@/lib/utils' // Remove paginateItems
 import { ClientThemeToggle } from '@/components/client-theme-toggle'
 import { CalendarDisplay } from '@/components/calendar-display'
 
@@ -14,29 +15,80 @@ interface HomePageClientProps {
   initialPosts: Post[]
   user: { id: string; email?: string } | null
   userIsAdmin: boolean
+  initialPage: number
+  totalPages: number
+  totalItems: number
+  postsPerPage: number
 }
 
 const POSTS_PER_PAGE = 6
 
-export function HomePageClient({ initialPosts: posts, user, userIsAdmin }: HomePageClientProps) {
+export function HomePageClient({
+  initialPosts: posts,
+  user,
+  userIsAdmin,
+  initialPage,
+  totalPages,
+  totalItems,
+  postsPerPage
+}: HomePageClientProps) {
+  const router = useRouter()
   const [searchQuery, setSearchQuery] = useState('')
-  const [currentPage, setCurrentPage] = useState(1)
+  // currentPage is now controlled by initialPage from props
+  const currentPage = initialPage
+
+  // Debug: Log state changes
+  console.log('HomePageClient render - currentPage:', currentPage, 'searchQuery:', searchQuery)
 
   // Filter posts based on search query and category
   const filteredPosts = useMemo(() => {
     return searchPosts(posts, searchQuery);
   }, [posts, searchQuery])
 
-  // Paginate filtered posts
+  // Paginated data is now passed via props, but we still need to filter for search
   const paginatedData = useMemo(() => {
-    return paginateItems(filteredPosts, currentPage, POSTS_PER_PAGE);
-  }, [filteredPosts, currentPage])
+    // If there's a search query, filter the initial posts
+    const itemsToDisplay = searchQuery ? searchPosts(posts, searchQuery) : posts;
+
+    return {
+      items: itemsToDisplay, // These are already paginated from server, but filtered here
+      totalItems: totalItems, // Total items from server
+      totalPages: totalPages, // Total pages from server
+      currentPage: initialPage, // Current page from server
+      hasNextPage: initialPage < totalPages,
+      hasPreviousPage: initialPage > 1
+    };
+  }, [posts, searchQuery, initialPage, totalPages, totalItems]);
 
   // Reset to first page when search or category changes
-  const handleSearch = (query: string) => {
-    setSearchQuery(query)
-    setCurrentPage(1)
-  }
+  const handleSearch = useCallback((query: string) => {
+    setSearchQuery(query);
+    // When search query changes, reset page to 1 and update URL
+    const newSearchParams = new URLSearchParams();
+    if (query) {
+      newSearchParams.set('query', query);
+    }
+    newSearchParams.set('page', '1');
+    router.push(`/?${newSearchParams.toString()}`);
+  }, [router]);
+
+  // Handle page change by updating URL search params
+  const handlePageChange = useCallback((page: number) => {
+    console.log('Homepage Pagination - handlePageChange called:', {
+      requestedPage: page,
+      currentPage: initialPage,
+      totalPages: totalPages,
+      totalItems: totalItems,
+      postsPerPage: postsPerPage
+    });
+
+    const newSearchParams = new URLSearchParams();
+    if (searchQuery) {
+      newSearchParams.set('query', searchQuery);
+    }
+    newSearchParams.set('page', page.toString());
+    router.push(`/?${newSearchParams.toString()}`);
+  }, [initialPage, totalPages, totalItems, postsPerPage, router, searchQuery]);
 
 
   // Get featured post (most recent post)
@@ -171,7 +223,7 @@ export function HomePageClient({ initialPosts: posts, user, userIsAdmin }: HomeP
                         href="#posts"
                         onClick={() => {
                           setSearchQuery('')
-                          setCurrentPage(1)
+                          handlePageChange(1)
                         }}
                         className="inline-flex items-center px-6 py-3 rounded-lg bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors"
                       >
@@ -199,15 +251,15 @@ export function HomePageClient({ initialPosts: posts, user, userIsAdmin }: HomeP
                 {paginatedData.totalPages > 1 && (
                   <section className="mb-12 space-y-6">
                     <Pagination
-                      currentPage={paginatedData.currentPage}
-                      totalPages={paginatedData.totalPages}
-                      onPageChange={setCurrentPage}
+                      currentPage={currentPage}
+                      totalPages={totalPages}
+                      onPageChange={handlePageChange}
                     />
                     <PaginationInfo
-                      currentPage={paginatedData.currentPage}
-                      totalPages={paginatedData.totalPages}
-                      totalItems={paginatedData.totalItems}
-                      itemsPerPage={POSTS_PER_PAGE}
+                      currentPage={currentPage}
+                      totalPages={totalPages}
+                      totalItems={totalItems}
+                      itemsPerPage={postsPerPage}
                     />
                   </section>
                 )}

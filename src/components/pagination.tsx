@@ -1,6 +1,7 @@
 'use client'
 
 import { cn } from '@/lib/utils'
+import { useCallback } from 'react'
 
 interface PaginationProps {
   currentPage: number
@@ -19,26 +20,38 @@ export function Pagination({
   showFirstLast = true,
   maxVisiblePages = 5
 }: PaginationProps) {
-  if (totalPages <= 1) return null
+  // Validate props to prevent runtime errors
+  const validCurrentPage = Math.max(1, Math.min(currentPage || 1, totalPages || 1))
+  const validTotalPages = Math.max(1, totalPages || 1)
+
+  if (validTotalPages <= 1) return null
+
+  // Memoized page change handler to prevent unnecessary re-renders
+  const handlePageChange = useCallback((page: number) => {
+    const validPage = Math.max(1, Math.min(page, validTotalPages))
+    if (validPage !== validCurrentPage && onPageChange) {
+      onPageChange(validPage)
+    }
+  }, [validCurrentPage, validTotalPages, onPageChange])
 
   const getVisiblePages = () => {
     const pages: (number | string)[] = []
-    
-    if (totalPages <= maxVisiblePages) {
+
+    if (validTotalPages <= maxVisiblePages) {
       // Show all pages if total is less than max visible
-      for (let i = 1; i <= totalPages; i++) {
+      for (let i = 1; i <= validTotalPages; i++) {
         pages.push(i)
       }
     } else {
       // Calculate start and end of visible range
-      let start = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2))
-      const end = Math.min(totalPages, start + maxVisiblePages - 1)
-      
+      let start = Math.max(1, validCurrentPage - Math.floor(maxVisiblePages / 2))
+      const end = Math.min(validTotalPages, start + maxVisiblePages - 1)
+
       // Adjust start if we're near the end
       if (end - start + 1 < maxVisiblePages) {
         start = Math.max(1, end - maxVisiblePages + 1)
       }
-      
+
       // Add first page and ellipsis if needed
       if (start > 1) {
         pages.push(1)
@@ -46,21 +59,21 @@ export function Pagination({
           pages.push('...')
         }
       }
-      
+
       // Add visible pages
       for (let i = start; i <= end; i++) {
         pages.push(i)
       }
-      
+
       // Add ellipsis and last page if needed
-      if (end < totalPages) {
-        if (end < totalPages - 1) {
+      if (end < validTotalPages) {
+        if (end < validTotalPages - 1) {
           pages.push('...')
         }
-        pages.push(totalPages)
+        pages.push(validTotalPages)
       }
     }
-    
+
     return pages
   }
 
@@ -82,14 +95,19 @@ export function Pagination({
     )
 
   return (
-    <nav 
+    <nav
       className={cn("flex items-center justify-center gap-1 sm:gap-2", className)}
       aria-label="Pagination"
     >
       {/* First Page Button */}
-      {showFirstLast && currentPage > 1 && (
+      {showFirstLast && validCurrentPage > 1 && (
         <button
-          onClick={() => onPageChange(1)}
+          type="button"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            handlePageChange(1);
+          }}
           className={buttonClass(false, false)}
           aria-label="Go to first page"
         >
@@ -101,9 +119,14 @@ export function Pagination({
 
       {/* Previous Page Button */}
       <button
-        onClick={() => onPageChange(currentPage - 1)}
-        disabled={currentPage <= 1}
-        className={buttonClass(false, currentPage <= 1)}
+        type="button"
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          handlePageChange(validCurrentPage - 1);
+        }}
+        disabled={validCurrentPage <= 1}
+        className={buttonClass(false, validCurrentPage <= 1)}
         aria-label="Go to previous page"
       >
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -122,7 +145,12 @@ export function Pagination({
               </span>
             ) : (
               <button
-                onClick={() => onPageChange(page as number)}
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onPageChange(page as number);
+                }}
                 className={buttonClass(page === currentPage, false)}
                 aria-label={`Go to page ${page}`}
                 aria-current={page === currentPage ? 'page' : undefined}
@@ -136,7 +164,13 @@ export function Pagination({
 
       {/* Next Page Button */}
       <button
-        onClick={() => onPageChange(currentPage + 1)}
+        type="button"
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          console.log('Next button clicked, current page:', currentPage, 'going to:', currentPage + 1);
+          onPageChange(currentPage + 1);
+        }}
         disabled={currentPage >= totalPages}
         className={buttonClass(false, currentPage >= totalPages)}
         aria-label="Go to next page"
@@ -150,7 +184,12 @@ export function Pagination({
       {/* Last Page Button */}
       {showFirstLast && currentPage < totalPages && (
         <button
-          onClick={() => onPageChange(totalPages)}
+          type="button"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onPageChange(totalPages);
+          }}
           className={buttonClass(false, false)}
           aria-label="Go to last page"
         >

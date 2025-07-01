@@ -16,6 +16,8 @@ export default function ManagePostsClient({ posts: initialPosts }: ManagePostsCl
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [sortBy, setSortBy] = useState<'latest' | 'oldest' | 'title-asc' | 'title-desc'>('latest')
   const [isRefreshing, setIsRefreshing] = useState(false)
+  const [isImporting, setIsImporting] = useState(false)
+  const [isBulkProcessing, setIsBulkProcessing] = useState(false)
   const router = useRouter()
 
   const handleDelete = async (postId: string, title: string) => {
@@ -85,12 +87,16 @@ export default function ManagePostsClient({ posts: initialPosts }: ManagePostsCl
   }
 
   const handleImport = () => {
+    if (isImporting) return
+
     const input = document.createElement('input')
     input.type = 'file'
     input.accept = '.json'
     input.onchange = async (e) => {
       const file = (e.target as HTMLInputElement).files?.[0]
       if (!file) return
+
+      setIsImporting(true)
 
       try {
         const text = await file.text()
@@ -122,12 +128,16 @@ export default function ManagePostsClient({ posts: initialPosts }: ManagePostsCl
       } catch (error) {
         console.error('Error importing posts:', error)
         alert('Error importing posts. Please check the file format and try again.')
+      } finally {
+        setIsImporting(false)
       }
     }
     input.click()
   }
 
-  const handleBulkActions = () => {
+  const handleBulkActions = async () => {
+    if (isBulkProcessing) return
+
     const selectedPosts = posts.filter((_, index) => {
       const checkbox = document.querySelector(`input[data-post-id="${posts[index].id}"]`) as HTMLInputElement
       return checkbox?.checked
@@ -142,7 +152,15 @@ export default function ManagePostsClient({ posts: initialPosts }: ManagePostsCl
 
     if (action === '1') {
       if (confirm(`Are you sure you want to delete ${selectedPosts.length} selected posts? This action cannot be undone.`)) {
-        selectedPosts.forEach(post => handleDelete(post.id, post.title))
+        setIsBulkProcessing(true)
+        try {
+          // Process deletions sequentially to avoid overwhelming the server
+          for (const post of selectedPosts) {
+            await handleDelete(post.id, post.title)
+          }
+        } finally {
+          setIsBulkProcessing(false)
+        }
       }
     } else if (action === '2') {
       const dataStr = JSON.stringify(selectedPosts, null, 2)
@@ -518,21 +536,31 @@ export default function ManagePostsClient({ posts: initialPosts }: ManagePostsCl
             </Link>
             <button
               onClick={handleImport}
-              className="flex items-center text-sm text-muted-foreground hover:text-primary transition-colors"
+              disabled={isImporting}
+              className="flex items-center text-sm text-muted-foreground hover:text-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
-              </svg>
-              Import posts
+              {isImporting ? (
+                <div className="w-4 h-4 mr-2 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+              ) : (
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
+                </svg>
+              )}
+              {isImporting ? 'Importing...' : 'Import posts'}
             </button>
             <button
               onClick={handleBulkActions}
-              className="flex items-center text-sm text-muted-foreground hover:text-primary transition-colors"
+              disabled={isBulkProcessing}
+              className="flex items-center text-sm text-muted-foreground hover:text-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
-              </svg>
-              Bulk actions
+              {isBulkProcessing ? (
+                <div className="w-4 h-4 mr-2 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+              ) : (
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                </svg>
+              )}
+              {isBulkProcessing ? 'Processing...' : 'Bulk actions'}
             </button>
           </div>
         </div>

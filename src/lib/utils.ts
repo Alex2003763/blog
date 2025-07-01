@@ -107,11 +107,13 @@ export function paginateItems<T>(
   hasPreviousPage: boolean
 } {
   const totalItems = items.length
-  const totalPages = Math.ceil(totalItems / itemsPerPage)
-  const currentPage = Math.max(1, Math.min(page, totalPages))
+  const totalPages = Math.ceil(totalItems / itemsPerPage) || 1
+
+  // Use the page as provided (validation should be done by caller)
+  const currentPage = page
   const startIndex = (currentPage - 1) * itemsPerPage
   const endIndex = startIndex + itemsPerPage
-  
+
   return {
     items: items.slice(startIndex, endIndex),
     totalItems,

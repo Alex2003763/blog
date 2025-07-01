@@ -37,7 +37,24 @@ const nextConfig: NextConfig = {
       ]
     }
   ],
-  webpack: (config, { isServer }) => {
+  // Turbopack configuration for development
+  experimental: {
+    turbo: {
+      rules: {
+        '*.svg': {
+          loaders: ['@svgr/webpack'],
+          as: '*.js',
+        },
+      },
+    },
+  },
+  // Only apply webpack config when not using Turbopack
+  webpack: (config, { isServer, dev }) => {
+    // Skip webpack config when using Turbopack in development
+    if (dev && process.env.TURBOPACK) {
+      return config;
+    }
+
     config.experiments = {
       ...config.experiments,
       topLevelAwait: true,

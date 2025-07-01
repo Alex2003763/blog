@@ -13,16 +13,21 @@ export function NewsletterSignup({ className }: NewsletterSignupProps) {
   const [isSubscribed, setIsSubscribed] = useState(false)
   const [error, setError] = useState('')
 
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    return emailRegex.test(email)
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
-    
-    if (!email) {
+
+    if (!email.trim()) {
       setError('Please enter your email address')
       return
     }
 
-    if (!email.includes('@')) {
+    if (!validateEmail(email.trim())) {
       setError('Please enter a valid email address')
       return
     }
@@ -31,11 +36,21 @@ export function NewsletterSignup({ className }: NewsletterSignupProps) {
 
     try {
       // Simulate API call - replace with actual newsletter service
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      await new Promise((resolve, reject) => {
+        setTimeout(() => {
+          // Simulate occasional failures for testing
+          if (Math.random() > 0.9) {
+            reject(new Error('Network error'))
+          } else {
+            resolve(undefined)
+          }
+        }, 1000)
+      })
       setIsSubscribed(true)
       setEmail('')
-    } catch {
-      setError('Something went wrong. Please try again.')
+    } catch (error) {
+      console.error('Newsletter signup error:', error)
+      setError('Unable to subscribe at the moment. Please try again later.')
     } finally {
       setIsSubmitting(false)
     }
@@ -121,9 +136,7 @@ export function NewsletterSignup({ className }: NewsletterSignupProps) {
             >
               {isSubmitting ? (
                 <>
-                  <svg className="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                  </svg>
+                  <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
                   Subscribing...
                 </>
               ) : (
@@ -138,7 +151,14 @@ export function NewsletterSignup({ className }: NewsletterSignupProps) {
           </div>
           
           {error && (
-            <p className="text-red-500 text-sm text-center">{error}</p>
+            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3">
+              <p className="text-red-600 dark:text-red-400 text-sm text-center flex items-center justify-center gap-2">
+                <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                {error}
+              </p>
+            </div>
           )}
         </form>
 

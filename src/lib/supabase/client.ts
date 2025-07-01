@@ -1,16 +1,31 @@
 import { createBrowserClient } from '@supabase/ssr'
 
 export function createClient() {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+  // Detect if we're running on localhost
+  const isLocalhost = typeof window !== 'undefined' &&
+    (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+
+  const cookieOptions = {
+    // Let browser handle domain automatically - don't set domain
+    sameSite: 'lax' as const,
+    secure: !isLocalhost, // Only use secure cookies in production
+    path: '/',
+  }
+
+  // Debug logging
+  if (typeof window !== 'undefined') {
+    console.log('Supabase client config:', {
+      hostname: window.location.hostname,
+      isLocalhost,
+      cookieOptions
+    })
+  }
+
   return createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
-      cookieOptions: {
-        domain: new URL(siteUrl).hostname,
-        sameSite: 'lax',
-        secure: true
-      },
+      cookieOptions,
       auth: {
         autoRefreshToken: true,
         persistSession: true,
